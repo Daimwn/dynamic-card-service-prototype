@@ -88,7 +88,10 @@ async function getByPath(path) {
     path = path.startsWith('/')?locationPathName+path:path;
     let data = JSON.parse(await window.localStorage.getItem(path));
     if (data == undefined) {
-        data = (await fetch(path)).json()
+        let h = new Headers();
+        h.set('mode', 'no-cors');
+        const req = new Request(path, {"headers":h});
+        data = (await fetch(req)).json()
     }
     return await data;
 }
