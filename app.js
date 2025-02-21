@@ -1,6 +1,7 @@
 //functions: https://learn.microsoft.com/en-us/azure/bot-service/adaptive-expressions/adaptive-expressions-prebuilt-functions?view=azure-bot-service-4.0
 const main = document.getElementById('maincontainer');
 const appbar = document.getElementById('appBarContainer');
+const locationPathName = window.location.hostname.includes('github.io') ? window.location.href : '';
 var fetchHistory = [];
 let templateList;
 class newData {
@@ -84,6 +85,7 @@ const mainData = {
     }
 };
 async function getByPath(path) {
+    path = path.startsWith('/')?locationPathName+path:path;
     let data = JSON.parse(await window.localStorage.getItem(path));
     if (data == undefined) {
         data = (await fetch(path)).json()
@@ -107,7 +109,7 @@ function navButtonClick(action) {
                     action._propertyBag.url = fetchHistory.pop();
                     action._propertyBag.url = fetchHistory.pop();
                     console.log(`navigating to ${action._propertyBag.url}`);
-                    mainData.Open([action._propertyBag.url],'maincontainer',undefined,true);
+                    mainData.Open([action._propertyBag.url[0]],'maincontainer',undefined,true);
                 }
                 break;
                 case 'add':{
