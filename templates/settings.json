@@ -1,0 +1,47 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Settings",
+            "wrap": true,
+            "style": "heading"
+        },
+        {
+            "type": "Input.Text",
+            "placeholder": "Placeholder text ${maxCards}",
+            "label": "Max Cards",
+            "id": "maxCards",
+            "value":"${string(maxCards)}"
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "choices": [
+                {
+                    "title": "Light",
+                    "value": "light"
+                },
+                {
+                    "title": "Dark",
+                    "value": "dark"
+                }
+            ],
+            "placeholder": "Placeholder text",
+            "id": "theme",
+            "label": "Theme",
+            "value": "${theme}"
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.Submit",
+                    "title": "Save",
+                    "data":{"@type":"Profile"}
+                }
+            ]
+        }
+    ]
+}

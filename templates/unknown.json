@@ -1,0 +1,25 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.6",
+    "name":"unknown",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Unknown Data",
+            "wrap": true,
+            "style": "heading"
+        },
+        {
+            "type": "FactSet",
+            "$data": "${fields}",
+            "facts": [
+                {
+                    "title": "${key}",
+                    "value": "${value}"
+                }
+            ]
+        }
+    ],
+    "lang": "D"
+}

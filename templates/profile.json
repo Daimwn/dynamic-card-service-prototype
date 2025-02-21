@@ -1,0 +1,50 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Profile",
+            "wrap": true,
+            "separator": true,
+            "style": "heading"
+        },
+        {
+            "type": "Input.Text",
+            "placeholder": "${foo} Placeholder text ${hello.world}",
+            "label": "Name",
+            "id": "name",
+            "value":"${name}"
+        },
+        {
+            "type": "Input.Text",
+            "placeholder": "Placeholder text",
+            "label": "favorite color",
+            "id": "color",
+            "value":"${color}"
+        },
+        {
+            "type": "Input.Text",
+            "placeholder": "Placeholder text",
+            "label": "background color",
+            "id": "background",
+            "value":"${background}"
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.Submit",
+                    "title": "Save",
+                    "data":{"@type":"Profile"}
+                },
+                {
+                    "type":"Action.OpenUrl",
+                    "title": "Favorites",
+                    "url":"/me/favorites.json"
+                }
+            ]
+        }
+    ]
+}

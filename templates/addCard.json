@@ -1,0 +1,25 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "Input.Text",
+            "placeholder": "path...",
+            "id": "gotoPath",
+            "value": "",
+            "inlineAction": {
+                "type": "Action.Execute",
+                "title": "add",
+                "verb":"replace",
+                "tooltip": "go to input path"
+            },
+            "data": {
+                "foo": "bar"
+            },
+            "associatedInputs": [
+                "gotoPath"
+            ]
+        }
+    ],
+    "verticalContentAlignment": "Center"
+}

@@ -1,0 +1,48 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "Input.Text",
+            "placeholder": "path...",
+            "id": "gotoPath",
+            "value": "",
+            "inlineAction": {
+                "type": "Action.Submit",
+                "title": "goto",
+                "tooltip": "go to input path"
+            },
+            "data": {
+                "foo": "bar"
+            },
+            "associatedInputs": [
+                "gotoPath"
+            ]
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.Execute",
+                    "title": "Back",
+                    "verb": "Back"
+                },
+                {
+                    "type": "Action.OpenUrl",
+                    "title": "Profile",
+                    "url": "/me/profile.json"
+                },
+                {
+                    "type": "Action.OpenUrl",
+                    "title": "Settings",
+                    "url": "/app/settings.json"
+                },
+                {
+                    "type": "Action.Execute",
+                    "title": "Add Card",
+                    "verb": "add"
+                }
+            ]
+        }
+    ]
+}

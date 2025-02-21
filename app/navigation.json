@@ -1,0 +1,20 @@
+{
+    "name":"navigation",
+    "actions":[
+        {
+            "type":"Action.Execute",
+            "title":"Back",
+            "verb":"Back"
+        },
+        {
+            "type":"Action.openUrl",
+            "title":"Profile",
+            "url":"/me/profile.json"
+        },
+        {
+            "type":"Action.openUrl",
+            "title":"Settings",
+            "url":"/app/settings.json"
+        }
+    ]
+}

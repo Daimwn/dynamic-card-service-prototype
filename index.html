@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root{
+            --themeColor:rgb(200, 200, 200);
+            --themeBackgroundColor: #121212;
+        }
+        .ac-textBlock, .ac-pushButton, span{
+            color:var(--themeColor)!important;
+        }
+        .ac-pushButton{
+            background-color: #ffffff00 !important;
+            border: 1px solid var(--themeColor) !important;
+            border-radius: 5px !important;
+        }
+        body {
+            background: linear-gradient(22deg, rgba(2,0,36,1) 0%, rgba(41,41,125,1) 22%, rgba(8,27,81,1) 50%, rgba(10,94,135,1) 81%, rgba(0,0,0,1) 100%);
+            /* background-color: var(--themeBackgroundColor); */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #maincontainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+            height: 100%;
+        }
+
+        #maincontainer > * {
+            max-width: 600px;
+            min-width: 300px;
+            background-color: #2d2d2d98 !important;
+            margin: 10px!important;
+            border-radius: 10px;
+            border: rgb(129, 129, 129) solid 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="maincontainer"></div>
+    <div id="appBarContainer"></div>
+</body>
+<!-- <script src="app.js"></script> -->
+<script type="text/javascript" src="adaptivecards-expressions.js"></script>
+<script src="https://unpkg.com/adaptivecards-templating/dist/adaptivecards-templating.min.js"></script>
+<script src="https://unpkg.com/adaptivecards/dist/adaptivecards.js"></script>
+<script src="app2.js"></script>
+
+</html>

@@ -1,0 +1,17 @@
+{
+    "name":"my favorites",
+    "favorites":[
+        {
+            "name":"settings",
+            "path":"/app/settings.json"
+        },
+        {
+            "name":"profile",
+            "path":"/me/profile.json"
+        },
+        {
+            "name":"favorites",
+            "path":"/me/favorites.json"
+        }
+    ]
+}
