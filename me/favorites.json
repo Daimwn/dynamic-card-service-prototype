@@ -1,17 +1,29 @@
 {
-    "name":"my favorites",
-    "favorites":[
+    "name": "my favorites",
+    "favorites": [
         {
-            "name":"settings",
-            "path":"/app/settings.json"
+            "name": "settings",
+            "path": "/app/settings.json"
         },
         {
-            "name":"profile",
-            "path":"/me/profile.json"
+            "name": "profile",
+            "path": "/me/profile.json"
         },
         {
-            "name":"favorites",
-            "path":"/me/favorites.json"
+            "name": "favorites",
+            "path": "/me/favorites.json"
+        },
+        {
+            "name": "Cat Facts",
+            "path": "https://catfact.ninja/fact"
+        },
+        {
+            "name": "Random Joke",
+            "path":"https://v2.jokeapi.dev/joke/Any"
+        },
+        {
+            "name":"Random Dog",
+            "path":"https://dog.ceo/api/breeds/image/random"
         }
     ]
 }
