@@ -3,5 +3,6 @@
     "/me/favorites.json":"/templates/favorites.json",
     "/app/settings.json":"/templates/settings.json",
     "/app/navigation.json":"/templates/navigation.json",
-    "/app/addCard.json":"/templates/addCard.json"
+    "/app/addCard.json":"/templates/addCard.json",
+    "https://v2.jokeapi.dev/joke/Any":"/templates/jokes.json"
 }

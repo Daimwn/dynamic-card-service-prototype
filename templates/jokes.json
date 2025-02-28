@@ -1,0 +1,37 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.6",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Random Joke",
+            "style": "heading"
+        },
+        {
+            "type": "TextBlock",
+            "text": "${setup}",
+            "wrap": true
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Delivery",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": "${delivery}"
+                            }
+                        ]
+                    },
+                    "style": "positive",
+                    "role": "Button"
+                }
+            ]
+        }
+    ]
+}

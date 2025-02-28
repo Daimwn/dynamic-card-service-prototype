@@ -58,18 +58,15 @@ class newData {
 const mainData = {
     "maincontainer": {},
     "appBarContainer": [],
-    Open: async function (paths, parent = "maincontainer", target, replace) {
-        // if(target !=target = document.getElementById(target);
-        // target = document.getElementById(target);
-        parent = document.getElementById(parent);
-        if(replace)parent.replaceChildren();//clears out the container
+    Open: async function (paths, clearFirst = true, target) {
+        // need to only do most of this if data was actually received and can be processed. should also be able to take a blank data object.
+        if(clearFirst)main.replaceChildren();//clears out the container
+        if(target!=undefined)target=document.getElementById(target);
         paths.forEach(async function (i) {
-            console.log(`opening path : ${i}`);
-            let data = await getByPath(i);
-            let card = new newData(i, data);
-            await card.getTemplate();
-            card = await card.renderCard();
-            parent.appendChild(card);
+            if(target==undefined)
+                await getProcessRenderData(i).then((card)=>{main.appendChild(card)});
+            else
+                await getProcessRenderData(i).then((card)=>{target.replaceWith(card)});
         });
         fetchHistory.push(paths);
     },
@@ -84,12 +81,30 @@ const mainData = {
         }
     }
 };
+
+async function getProcessRenderData(path) {
+    console.log(`opening path : ${path}`);
+    let data = await getByPath(path);
+    let card = new newData(path, data);
+    await card.getTemplate();
+    return await card.renderCard();
+}
 async function getByPath(path) {
     path = path.startsWith('/')?locationPathName+path:path;
     let data = JSON.parse(await window.localStorage.getItem(path));
     if (data == undefined) {
-        data = (await fetch(path)).json()
+        try{
+            data = (await fetch(path))
+            if (!data.ok) {
+                throw new Error(`Response status: ${data.status}`);
+              }
+              data = await data.json();
+        }
+        catch(err){
+            alert('oops');
+        }
     }
+    //handle if data is not json.
     return await data;
 }
 function navButtonClick(action) {
@@ -99,7 +114,7 @@ function navButtonClick(action) {
         case 'Action.Submit':
             mainData.post(action._parent._parent._renderedElement.id, action._processedData)
             //update UI.
-            if (action._processedData.gotoPath) mainData.Open(action._processedData.gotoPath.split(','),'maincontainer',undefined,true);
+            if (action._processedData.gotoPath) mainData.Open(action._processedData.gotoPath.split(','));
             break;
         case 'Action.Execute':
             console.log('executing');
@@ -113,12 +128,11 @@ function navButtonClick(action) {
                 }
                 break;
                 case 'add':{
-                    if(document.getElementById('/app/addCard.json')==undefined)mainData.Open(['/app/addCard.json'],undefined,false);
+                    if(document.getElementById('/app/addCard.json')==undefined)mainData.Open(['/app/addCard.json'],false);
                 }
                 break;
                 case 'replace':{
-                    console.log('but why?')
-                    mainData.Open([action._processedData.gotoPath],'maincontainer','/app/addCard.json',true);
+                    mainData.Open([action._processedData.gotoPath],false,'/app/addCard.json');
                 }
                 break;
             }
@@ -141,10 +155,8 @@ function applySettings() {
 }
 applySettings();
 mainData.Open(['/me/favorites.json'],'maincontainer',undefined,true);
-mainData.Open(['/app/navigation.json'], "appBarContainer");
-// let feed = fetch('https://feeds.npr.org/510318/podcast.xml');
-// console.log(feed);
-window.addEventListener("storage", (e) => { console.log('storage changed') });
+// mainData.Open(['/app/navigation.json'], "appBarContainer");
+getProcessRenderData('/app/navigation.json').then((card)=>{appbar.appendChild(card)});
 //try get setting from localstorage
 let settings = JSON.parse(window.localStorage.getItem('/app/settings.json')) || {
     "name": "my favorites",
@@ -166,4 +178,8 @@ let settings = JSON.parse(window.localStorage.getItem('/app/settings.json')) || 
 
 function saveSettings() {
     window.localStorage.setItem('/app/settings.json', JSON.stringify(settings));
+}
+
+function testExecute(d){
+    
 }
