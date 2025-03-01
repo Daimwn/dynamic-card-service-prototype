@@ -5,27 +5,23 @@ const locationPathName = window.location.hostname.includes('github.io') ? window
 var fetchHistory = [];
 let templateList;
 class newData {
-    constructor(id, data, template, card) {
+    constructor(id) {
         this.i = id,
-            this.t = template,
-            this.cc = card,
-            this.data = data,
-            this.onDataChanged = this.renderCard,
             mainData.maincontainer[this.i] = this
     }
-    dh = [];
+    dh = [this.render];
     set onDataChanged(callback) {
         this.dh.push(callback);
     };
-    dataChanged() { console.log(`data changed on ${this.i}`); this.dh.forEach((x) => x.call(this)); }
+    dataChanged() { console.log(`data changed on ${this.i}`); this.dh.forEach(async (x) => await x.call(this)); }//this isn't going to work if render needs to be awaited.
     set data(newD) { this.d = newD; this.dataChanged(); }
     get data() { return this.d }
     async getTemplate() {
         console.log('templating')
         if (this.t == undefined) {
-            if (templateList == undefined) templateList = await getByPath('/app/templatesList.json');
-            const templatePath = this.d.templatePath || templateList[this.i] || '/templates/unknown.json'
-            if (templatePath == '/templates/unknown.json') {
+            if (templateList == undefined) templateList = await getByPath('/app/templatesList.json');//this should just move to app initialization
+            const templatePath = templateList[this.i] || '/templates/unknown.json'//this.d.templatePath || 
+            if (templatePath == '/templates/unknown.json') {//if no template then flatten data for basic rendering.
                 //flat data
                 let keys = Object.keys(this.d);
                 let values = Object.values(this.d);
@@ -39,10 +35,11 @@ class newData {
             this.t = new ACData.Template(template);
         }
     }
-    async renderCard() {
+    async render() {
         console.log('rendering');
         console.log(this);
-        const populatedTempalte = this.t.expand({ $root: this.d });//this should be in render card
+        await this.getTemplate();
+        const populatedTempalte = this.t.expand({ $root: this.d });
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: "Segoe UI, Helvetica Neue, sans-serif"
@@ -51,22 +48,53 @@ class newData {
         await adaptiveCard.parse(populatedTempalte);
         const card = adaptiveCard.render();
         card.id = this.i;
-        return card;
+        let node = document.getElementById(this.i);
+        node.replaceWith(card);
+        return card;//don't need to save the rendered card so just return it for most flexibility.
+    }
+    async initialize() {
+        //if path is blank, then id is blank. if id is blank, then rendered card id is blank. 
+        //random guid instead?
+        if (this.i == undefined) this.data = {}
+        this.i = this.i.startsWith('/') ? locationPathName + this.i : this.i;
+        let data = JSON.parse(await window.localStorage.getItem(this.i));
+        if (data == undefined) {
+            try {
+                data = (await fetch(this.i))
+                if (!data.ok) {
+                    throw new Error(`Response status: ${data.status}`);
+                }
+                data = await data.json();
+            }
+            catch (err) {
+                alert('oops');
+            }
+        }
+        //handle if data is not json.
+        if (data.type == 'AdaptiveCard') {//if given path returned a card instead of data, blank this data and assign to template.
+            this.t = new ACData.Template(data);
+            data = undefined//make blank. probably not needed as it will just be undefined....
+        }
+        this.data = data;//this will kick off rendering.
     }
 }
 
 const mainData = {
     "maincontainer": {},
     "appBarContainer": [],
-    Open: async function (paths, clearFirst = true, target) {
+    Open: async function (paths, clearFirst = true, targetId) {
         // need to only do most of this if data was actually received and can be processed. should also be able to take a blank data object.
-        if(clearFirst)main.replaceChildren();//clears out the container
-        if(target!=undefined)target=document.getElementById(target);
+        const target = targetId == undefined ? main : document.getElementById(targetId);
+        if (clearFirst) target.replaceChildren();//clears out the container
         paths.forEach(async function (i) {
-            if(target==undefined)
-                await getProcessRenderData(i).then((card)=>{main.appendChild(card)});
-            else
-                await getProcessRenderData(i).then((card)=>{target.replaceWith(card)});
+            i = i.trim();//remove spaces from path.
+            let d = new newData(i);
+            //create a loading placeholder element. This gets replaced with the rendered card.
+            const loadingElement = (document.createElement('div'))
+            loadingElement.innerText = 'Loading...';
+            target.appendChild(loadingElement);//add loading element as placeholder
+            loadingElement.id = i;
+            await d.initialize();
         });
         fetchHistory.push(paths);
     },
@@ -82,25 +110,18 @@ const mainData = {
     }
 };
 
-async function getProcessRenderData(path) {
-    console.log(`opening path : ${path}`);
-    let data = await getByPath(path);
-    let card = new newData(path, data);
-    await card.getTemplate();
-    return await card.renderCard();
-}
 async function getByPath(path) {
-    path = path.startsWith('/')?locationPathName+path:path;
+    path = path.startsWith('/') ? locationPathName + path : path;
     let data = JSON.parse(await window.localStorage.getItem(path));
     if (data == undefined) {
-        try{
+        try {
             data = (await fetch(path))
             if (!data.ok) {
                 throw new Error(`Response status: ${data.status}`);
-              }
-              data = await data.json();
+            }
+            data = await data.json();
         }
-        catch(err){
+        catch (err) {
             alert('oops');
         }
     }
@@ -112,40 +133,40 @@ function navButtonClick(action) {
 
     switch (action._propertyBag.type) {
         case 'Action.Submit':
-            mainData.post(action._parent._parent._renderedElement.id, action._processedData)
             //update UI.
             if (action._processedData.gotoPath) mainData.Open(action._processedData.gotoPath.split(','));
+            else mainData.post(action._parent._parent._renderedElement.id, action._processedData)
             break;
         case 'Action.Execute':
             console.log('executing');
-            switch(action._propertyBag.verb){
+            switch (action._propertyBag.verb) {
                 case 'Back': {
                     console.log('backing up a level');
                     action._propertyBag.url = fetchHistory.pop();
                     action._propertyBag.url = fetchHistory.pop();
                     console.log(`navigating to ${action._propertyBag.url}`);
-                    mainData.Open([action._propertyBag.url[0]],'maincontainer',undefined,true);
+                    mainData.Open([action._propertyBag.url[0]], 'maincontainer', undefined, true);
                 }
-                break;
-                case 'add':{
-                    if(document.getElementById('/app/addCard.json')==undefined)mainData.Open(['/app/addCard.json'],false);
+                    break;
+                case 'add': {
+                    if (document.getElementById('/app/addCard.json') == undefined) mainData.Open(['/app/addCard.json'], false);
                 }
-                break;
-                case 'replace':{
-                    mainData.Open([action._processedData.gotoPath],false,'/app/addCard.json');
+                    break;
+                case 'replace': {
+                    mainData.Open([action._processedData.gotoPath], true, '/app/addCard.json');
                 }
-                break;
+                    break;
             }
             break;
         case 'Action.OpenUrl':
             console.log(`opening url ${action._propertyBag.url}`);
             //need to save history current page, as navigating away.
-            mainData.Open([action._propertyBag.url],'maincontainer',undefined,true)
+            mainData.Open([action._propertyBag.url], 'maincontainer', undefined, true)
     }
 }
 function applySettings() {
     const settings = JSON.parse(window.localStorage.getItem('/me/profile.json'))
-    try{
+    try {
         document.documentElement.style.setProperty('--themeColor', settings['color']);
         document.documentElement.style.setProperty('--themeBackgroundColor', settings['backgroundcolor']);
     }
@@ -154,9 +175,8 @@ function applySettings() {
     }
 }
 applySettings();
-mainData.Open(['/me/favorites.json'],'maincontainer',undefined,true);
-// mainData.Open(['/app/navigation.json'], "appBarContainer");
-getProcessRenderData('/app/navigation.json').then((card)=>{appbar.appendChild(card)});
+mainData.Open(['/me/profile.json','/me/favorites.json'],true,'maincontainer');
+mainData.Open(['/templates/navigation.json'],true,'appBarContainer');
 //try get setting from localstorage
 let settings = JSON.parse(window.localStorage.getItem('/app/settings.json')) || {
     "name": "my favorites",
@@ -178,8 +198,4 @@ let settings = JSON.parse(window.localStorage.getItem('/app/settings.json')) || 
 
 function saveSettings() {
     window.localStorage.setItem('/app/settings.json', JSON.stringify(settings));
-}
-
-function testExecute(d){
-    
 }
